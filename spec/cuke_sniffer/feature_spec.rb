@@ -15,6 +15,7 @@ describe CukeSniffer::Feature do
   end
 
   it "should gather all feature tags" do
+    pending("This specification does not work with valid gherkin")
     feature_block = [
         "@tag1 @tag2",
         "@tag3", '#@tag4',
@@ -129,6 +130,7 @@ describe CukeSniffer::Feature do
   describe "Handling Backgrounds" do
 
     it "should capture a background in a feature" do
+      pending("This specification does not follow the defined interface of the classes involved")
       feature_block = [
           "Feature: Feature with background",
           "Background: I am a background",
@@ -347,6 +349,7 @@ describe "FeatureRules" do
   end
 
   it "should punish Features that have a comment on a line after a tag" do
+    pending("This specification does not work with valid gherkin")
     feature_block = [
         "@tag",
         "#comment",

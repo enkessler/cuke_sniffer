@@ -51,6 +51,8 @@ module CukeSniffer
     private
 
     def split_feature(file_name, feature_lines)
+      ca_feature = CucumberAnalytics::Feature.new(feature_lines.join)
+
       index = 0
       until feature_lines[index].match /Feature:\s*(?<name>.*)/
         update_tag_list(feature_lines[index])

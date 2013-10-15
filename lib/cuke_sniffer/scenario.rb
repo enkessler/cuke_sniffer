@@ -62,6 +62,8 @@ module CukeSniffer
     private
 
     def split_scenario(scenario)
+      ca_scenario = CucumberAnalytics::Scenario.new(scenario.join("\n"))
+
       index = 0
       until index >= scenario.length or scenario[index] =~ SCENARIO_TITLE_STYLES
         update_tag_list(scenario[index])

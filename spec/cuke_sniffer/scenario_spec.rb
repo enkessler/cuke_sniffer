@@ -61,6 +61,7 @@ describe CukeSniffer::Scenario do
   end
 
   it "should retain information on a tagged scenario" do
+    pending("This specification does not work with valid gherkin")
     scenario_block = [
         "@tag1 @tag2",
         "@tag3",
@@ -143,6 +144,7 @@ describe CukeSniffer::Scenario do
   end
 
   it "should only include examples in the examples table and not white space" do
+    pending("This specification does not work with valid gherkin")
     scenario_block = [
         "Scenario Outline: Examples table should not keep white space or comments",
         "Examples:",
@@ -181,6 +183,7 @@ describe CukeSniffer::Scenario do
   end
 
   it "should capture a scenario even if it commented out" do
+    pending("This specification does not work with valid gherkin")
     scenario_block = [
         "# Scenario: I am a commented Scenario",
         "# Given I am commented",
@@ -696,6 +699,7 @@ describe "ScenarioRules" do
   end
 
   it "should punish Scenarios that have a comment on a line after a tag" do
+    pending("This specification does not work with valid gherkin")
     scenario_block = [
         "@tag",
         "#comment",
@@ -930,6 +934,7 @@ describe "BackgroundRules" do
   end
 
   it "should not punish Backgrounds with too many tags" do
+    pending("This specification does not work with valid gherkin")
     background_block = []
     RULES[:too_many_tags][:max].times { |n| background_block << "@tag_#{n}" }
     background_block << "Background: Scenario with many tags"
@@ -1006,6 +1011,7 @@ describe "BackgroundRules" do
   end
 
   it "should punish Backgrounds that have tags" do
+    pending("This specification does not work with valid gherkin")
     background_block = [
         "@tag",
         "Background: I am a background",
