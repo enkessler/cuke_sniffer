@@ -130,16 +130,17 @@ describe CukeSniffer::Feature do
   describe "Handling Backgrounds" do
 
     it "should capture a background in a feature" do
-      pending("This specification does not follow the defined interface of the classes involved")
       feature_block = [
-          "Feature: Feature with background",
-          "Background: I am a background",
-          "Given I want to be a test",
-          "When I become a test",
-          "Then I am a test"
+          "Feature: Feature with background"
       ]
-      build_file(feature_block, @file_name)
-      scenario = CukeSniffer::Scenario.new("#@file_name:3", feature_block)
+      background_block = [
+                "Background: I am a background",
+                "Given I want to be a test",
+                "When I become a test",
+                "Then I am a test"
+            ]
+      build_file(feature_block + background_block, @file_name)
+      scenario = CukeSniffer::Scenario.new("#@file_name:3", background_block)
       feature = CukeSniffer::Feature.new(@file_name)
       feature.background == scenario
       feature.scenarios.empty?.should == true

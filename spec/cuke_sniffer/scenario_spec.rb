@@ -144,9 +144,9 @@ describe CukeSniffer::Scenario do
   end
 
   it "should only include examples in the examples table and not white space" do
-    pending("This specification does not work with valid gherkin")
     scenario_block = [
         "Scenario Outline: Examples table should not keep white space or comments",
+        "  * a step",
         "Examples:",
         "|var_name|",
         "|one|",

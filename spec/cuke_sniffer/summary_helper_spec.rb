@@ -91,7 +91,6 @@ describe CukeSniffer::SummaryHelper do
     end
 
     it "should keep track of the lowest score out of the objects" do
-      pending("Needs a rewrite because scenario creation is destructive to the argument blocks")
       scenario_block = [
           "Scenario: My scenario",
           "Given I am a scenario"
@@ -106,7 +105,6 @@ describe CukeSniffer::SummaryHelper do
     end
 
     it "should keep track of the rule target object location with the lowest score" do
-      pending("Needs a rewrite because scenario creation is destructive to the argument blocks")
       scenario_block = [
           "Scenario: My scenario",
           "Given I am a scenario"
@@ -121,7 +119,6 @@ describe CukeSniffer::SummaryHelper do
     end
 
     it "should keep track of the highest score out of the objects" do
-      pending("Needs a rewrite because scenario creation is destructive to the argument blocks")
       scenario_block = [
           "Scenario: My scenario",
           "Given I am a scenario"
@@ -136,7 +133,6 @@ describe CukeSniffer::SummaryHelper do
     end
 
     it "should keep track of the rule target object file with the highest score" do
-      pending("Needs a rewrite because scenario creation is destructive to the argument blocks")
       scenario_block = [
           "Scenario: My scenario",
           "Given I am a scenario"
@@ -151,7 +147,6 @@ describe CukeSniffer::SummaryHelper do
     end
 
     it "should keep track of the average score (rounded to 2 decimal places) across all of the rule target objects" do
-      pending("Needs a rewrite because scenario creation is destructive to the argument blocks")
       scenario_block = [
           "Scenario: My scenario",
           "Given I am a scenario"
@@ -171,7 +166,6 @@ describe CukeSniffer::SummaryHelper do
     end
 
     it "should keep track of the number of rule target objects that were above the threshold (bad)." do
-      pending("Needs a rewrite because scenario creation is destructive to the argument blocks")
       scenario_block = [
           "Scenario: My scenario",
           "Given I am a scenario"
@@ -186,7 +180,6 @@ describe CukeSniffer::SummaryHelper do
     end
 
     it "should keep track of the number of rule target objects that were below the threshold (good)." do
-      pending("Needs a rewrite because scenario creation is destructive to the argument blocks")
       scenario_block = [
           "Scenario: My scenario",
           "Given I am a scenario"
@@ -201,7 +194,6 @@ describe CukeSniffer::SummaryHelper do
     end
 
     it "should keep a list of all improvements that need to be mad across the rule target objects" do
-      pending("Needs a rewrite because scenario creation is destructive to the argument blocks")
       scenario_block = [
           "Scenario: My scenario",
           "Given I am a scenario"
