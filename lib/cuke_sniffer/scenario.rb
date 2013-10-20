@@ -23,6 +23,9 @@ module CukeSniffer
     # string array: List of each step call in a scenario
     attr_accessor :steps
 
+    # string array: List of each comment line before a scenario
+    attr_accessor :comments
+
     # hash: Keeps each location and content of an inline table
     # * Key: Step string the inline table is attached to
     # * Value: Array of all of the lines in the table
@@ -61,47 +64,59 @@ module CukeSniffer
 
     private
 
-    def split_scenario(scenario)
-      ca_scenario = CucumberAnalytics::Scenario.new(scenario.join("\n"))
+    def split_scenario(source_lines)
+      scenario = CucumberAnalytics::Scenario.new(source_lines.join("\n"))
 
-      # Copy to avoid destruction of original block
-      scenario = Marshal::load(Marshal.dump(scenario))
-
-      index = 0
-      until index >= scenario.length or scenario[index] =~ SCENARIO_TITLE_STYLES
-        update_tag_list(scenario[index])
-        index += 1
+      # todo - Refactor this once cucumber_analytics is updated
+      case scenario.raw_element['keyword']
+        when 'Scenario Outline'
+          scenario = CucumberAnalytics::Outline.new(source_lines.join("\n"))
+        when 'Background'
+          scenario = CucumberAnalytics::Background.new(source_lines.join("\n"))
       end
 
-      until index >= scenario.length or scenario[index].match STEP_REGEX or scenario[index].include?("Examples:")
-        match = scenario[index].match(SCENARIO_TITLE_STYLES)
-        @type = match[:type] unless match.nil?
-        create_name(scenario[index], SCENARIO_TITLE_STYLES)
-        index += 1
-      end
 
-      until index >= scenario.length or scenario[index].include?("Examples:")
-        if scenario[index] =~ /^\|.*\|/
-          step = scenario[index - 1]
-          @inline_tables[step] = []
-          until index >= scenario.length or scenario[index] =~ /(#{STEP_REGEX}|^\s*Examples:)/
-            @inline_tables[step] << scenario[index]
-            index += 1
+      @type = scenario.raw_element['keyword']
+      @comments = scenario.raw_element['comments'].collect { |comment| comment['value'] } if scenario.raw_element['comments']
+      @tags = scenario.tags unless scenario.is_a?(CucumberAnalytics::Background)
+
+      @name = scenario.name
+      @name += ' ' + scenario.description.join(' ') unless scenario.description.empty?
+
+
+      scenario.steps.each do |step|
+        @steps += step.raw_element['comments'].collect { |comment| comment['value'] } if step.raw_element['comments']
+
+        # This can be done more simply if whitespace retention is not required.
+        @steps << source_lines[step.source_line - 2]
+
+        if step.block.is_a?(CucumberAnalytics::Table)
+          @inline_tables[@steps.last] = step.block.contents.collect { |table_row| '|' + table_row.join('|') + '|' }
+        end
+      end
+      @steps.delete_if { |step| step !~ STEP_REGEX }
+
+
+      if scenario.is_a?(CucumberAnalytics::Outline)
+        scenario.examples.count.times do |example_count|
+          example = scenario.examples[example_count]
+
+          example.row_elements.count.times do |row_count|
+            next if row_count == 0 && example_count != 0
+
+            example_row = example.row_elements[row_count]
+
+            @examples_table += example_row.raw_element['comments'].collect { |comment| comment['value'] } if example_row.raw_element['comments']
+
+            # This can be done more simply if whitespace retention is not required.
+            @examples_table << source_lines[example_row.source_line - 2]
           end
-        else
-          @steps << scenario[index] if scenario[index] =~ STEP_REGEX
-          index += 1
         end
+
+        @examples_table.flatten!
+        @examples_table.delete_if { |row| row !~ EXAMPLE_ROW_REGEX }
       end
 
-      if index < scenario.length and scenario[index].include?("Examples:")
-        index += 1
-        until index >= scenario.length
-          index += 2 if scenario[index].include?("Examples:")
-          @examples_table << scenario[index] if scenario[index] =~ /#{COMMENT_REGEX}\|.*\|/
-          index += 1
-        end
-      end
     end
   end
 end

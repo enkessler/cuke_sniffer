@@ -27,6 +27,9 @@ module CukeSniffer
     # String array: A list of all the lines in a feature file
     attr_accessor :feature_lines
 
+    # string array: List of each comment line before a feature
+    attr_accessor :comments
+
     # file_name must be in the format of "file_path\file_name.feature"
     def initialize(file_name)
       super(file_name)
@@ -52,6 +55,8 @@ module CukeSniffer
 
     def split_feature(file_name, feature_lines)
       ca_feature = CucumberAnalytics::Feature.new(feature_lines.join)
+
+      @comments = ca_feature.raw_element['comments'].collect{|comment| comment['value']} if ca_feature.raw_element['comments']
 
       index = 0
       until feature_lines[index].match /Feature:\s*(?<name>.*)/

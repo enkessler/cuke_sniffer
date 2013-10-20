@@ -338,8 +338,10 @@ module CukeSniffer
             :phrase => "{class} has a commented out tag",
             :score => WARNING,
             :targets => ["Feature", "Scenario"],
-            :reason => 'object.tags.each do | tag |
-                          store_rule(object, rule, rule.phrase.gsub("{class}", type)) if is_comment?(tag)
+            :reason => 'if object.comments
+                          object.comments.each do | comment |
+                            store_rule(object, rule, rule.phrase.gsub("{class}", type)) if comment =~ /@/
+                          end
                         end'
         },
         :empty_hook => {

@@ -33,6 +33,18 @@ describe CukeSniffer::Feature do
     feature.name.should == "My features are in this"
   end
 
+  it "should capture a feature's comment lines" do
+    feature_block = [
+        "# Some",
+        "# comments",
+        "Feature: My features are in this"
+    ]
+    build_file(feature_block, @file_name)
+      feature = CukeSniffer::Feature.new(@file_name)
+      feature.location.should == @file_name
+      feature.comments.should == ['# Some', '# comments']
+  end
+
   it "should capture a feature description that spans multiple lines" do
     feature_block = [
         "Feature: I am a feature description",
