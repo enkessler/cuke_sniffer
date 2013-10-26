@@ -65,6 +65,8 @@ module CukeSniffer
     private
 
     def split_scenario(source_lines)
+      # Sometimes the lines come in with separators and sometimes they don't
+      source_lines = source_lines.collect{|line|line.chomp}
       scenario = CucumberAnalytics::Scenario.new(source_lines.join("\n"))
 
       # todo - Refactor this once cucumber_analytics is updated

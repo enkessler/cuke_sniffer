@@ -266,7 +266,7 @@ describe "FeatureRules" do
 
   it "should punish Features with too many tags" do
     feature_block = []
-    RULES[:too_many_tags][:max].times { |n| feature_block << "@tag_#{n}" }
+    RULES[:too_many_tags][:max].times { |n| feature_block << "@tag_{n}" }
     feature_block << "Feature: Feature with many tags"
     test_feature_rule(feature_block, :too_many_tags)
   end

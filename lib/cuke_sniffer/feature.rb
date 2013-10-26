@@ -56,47 +56,23 @@ module CukeSniffer
     def split_feature(file_name, feature_lines)
       ca_feature = CucumberAnalytics::Feature.new(feature_lines.join)
 
-      @comments = ca_feature.raw_element['comments'].collect{|comment| comment['value']} if ca_feature.raw_element['comments']
+      @comments = ca_feature.raw_element['comments'].collect { |comment| comment['value'] } if ca_feature.raw_element['comments']
+      @tags = ca_feature.tags
 
-      index = 0
-      until feature_lines[index].match /Feature:\s*(?<name>.*)/
-        update_tag_list(feature_lines[index])
-        index += 1
+      @name = ca_feature.name
+      @name += ' ' + ca_feature.description.join(' ') unless ca_feature.description.empty?
+
+
+      scenarios = ca_feature.has_background? ? [ca_feature.background] + ca_feature.tests : ca_feature.tests
+
+      scenarios.each do |test_element|
+        start_index = determine_test_start_line(test_element) - 1
+        end_index = determine_test_end_line(test_element) - 1
+
+        test_lines = feature_lines[start_index..end_index]
+
+        add_scenario_to_feature(test_lines, "#{file_name}:#{test_element.source_line}")
       end
-
-      until index >= feature_lines.length or feature_lines[index].match TAG_REGEX or feature_lines[index].match SCENARIO_TITLE_REGEX
-        create_name(feature_lines[index], "Feature:")
-        index += 1
-      end
-
-      scenario_title_found = false
-      index_of_title = nil
-      code_block = []
-      until index >= feature_lines.length
-        if scenario_title_found and feature_lines[index].match SCENARIO_TITLE_REGEX
-          not_our_code = []
-          code_block.reverse.each do |line|
-            break if line =~ /#{SCENARIO_TITLE_STYLES}|#{STEP_STYLES}|^\|.*\||Examples:/
-            not_our_code << line
-          end
-
-          if not_our_code.empty?
-            add_scenario_to_feature(code_block, index_of_title)
-          else
-            add_scenario_to_feature(code_block[0...(-1 * not_our_code.length)], index_of_title)
-          end
-          scenario_title_found = false
-          code_block = not_our_code.reverse
-        end
-        code_block << feature_lines[index].strip
-        if feature_lines[index].match SCENARIO_TITLE_REGEX
-          scenario_title_found = true
-          index_of_title = "#{file_name}:#{index + 1}"
-        end
-        index += 1
-      end
-      #TODO - Last scenario falling through above logic, needs a fix (code_block related)
-      add_scenario_to_feature(code_block, index_of_title) unless code_block==[]
     end
 
     def add_scenario_to_feature(code_block, index_of_title)
@@ -107,5 +83,36 @@ module CukeSniffer
         @scenarios << scenario
       end
     end
+
+    def determine_test_start_line(test_element)
+      # todo - add test cases around these
+      case
+        when test_element.raw_element['comments']
+          test_element.raw_element['comments'].first['line']
+        when test_element.respond_to?(:tags) && test_element.tags.any?
+          test_element.tag_elements.first.source_line
+        else
+          test_element.source_line
+      end
+    end
+
+    def determine_test_end_line(test_element)
+      # todo - add test cases around these
+      case
+        when test_element.respond_to?(:examples)
+          test_element.examples.last.row_elements.last.source_line
+        when test_element.steps.any?
+          if test_element.steps.last.block.nil?
+            test_element.steps.last.source_line
+          else
+            test_element.steps.last.raw_element['rows'].last['line']
+          end
+        when test_element.description.any?
+          test_element.source_line + test_element.description.split("\n").count
+        else
+          test_element.source_line
+      end
+    end
+
   end
 end
