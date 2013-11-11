@@ -37,28 +37,19 @@ module CukeSniffer
             :targets => ["StepDefinition"],
             :reason => "object.nested_steps.each_value {|nested_step| store_rule(object, rule) if nested_step =~ object.regex}"
         },
-        :background_with_tag => {
+        :background_with_bad_syntax => {
             :enabled => true,
-            :phrase => "There is a background with a tag. This feature file cannot run!",
+            :phrase => "There is a background with bad syntax. This feature file cannot run!",
             :score => FATAL,
             :targets => ["Background"],
-            :reason =>  "object.tags.size > 0"
+            :reason =>  "object.syntax_error?"
         },
-        :comment_after_tag => {
+        :bad_syntax => {
             :enabled => true,
-            :phrase => "Comment comes between tag and properly executing line. This feature file cannot run!",
+            :phrase => "This feature file is not syntactically correct. This feature file cannot run!",
             :score => FATAL,
             :targets => ["Feature", "Scenario"],
-            :reason => "flag = false
-                        unless object.tags.empty?
-                          object.tags[1..-1].each do | tags |
-                            if tags =~ /^\\s*\\#.*$/
-                              flag = true
-                              break
-                            end
-                          end
-                        end
-                        flag"
+            :reason => "object.syntax_error?"
         },
         :universal_nested_step => {
             :enabled => true,

@@ -51,27 +51,37 @@ module CukeSniffer
       @total_score = @scenarios_score + @score
     end
 
+    def syntax_error?
+      !!@syntax_error
+    end
+
+
     private
 
     def split_feature(file_name, feature_lines)
-      ca_feature = CucumberAnalytics::Feature.new(feature_lines.join)
+      begin
+        ca_feature = CucumberAnalytics::Feature.new(feature_lines.join)
 
-      @comments = ca_feature.raw_element['comments'].collect { |comment| comment['value'] } if ca_feature.raw_element['comments']
-      @tags = ca_feature.tags
+        @comments = ca_feature.raw_element['comments'].collect { |comment| comment['value'] } if ca_feature.raw_element['comments']
+        @tags = ca_feature.tags
 
-      @name = ca_feature.name
-      @name += ' ' + ca_feature.description.join(' ') unless ca_feature.description.empty?
+        @name = ca_feature.name
+        @name += ' ' + ca_feature.description.join(' ') unless ca_feature.description.empty?
 
 
-      scenarios = ca_feature.has_background? ? [ca_feature.background] + ca_feature.tests : ca_feature.tests
+        scenarios = ca_feature.has_background? ? [ca_feature.background] + ca_feature.tests : ca_feature.tests
 
-      scenarios.each do |test_element|
-        start_index = determine_test_start_line(test_element) - 1
-        end_index = determine_test_end_line(test_element) - 1
+        scenarios.each do |test_element|
+          start_index = determine_test_start_line(test_element) - 1
+          end_index = determine_test_end_line(test_element) - 1
 
-        test_lines = feature_lines[start_index..end_index]
+          test_lines = feature_lines[start_index..end_index]
 
-        add_scenario_to_feature(test_lines, "#{file_name}:#{test_element.source_line}")
+          add_scenario_to_feature(test_lines, "#{file_name}:#{test_element.source_line}")
+        end
+
+      rescue Gherkin::Parser::ParseError
+        @syntax_error = true
       end
     end
 

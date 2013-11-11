@@ -62,61 +62,71 @@ module CukeSniffer
       order
     end
 
+    def syntax_error?
+      !!@syntax_error
+    end
+
     private
 
     def split_scenario(source_lines)
       # Sometimes the lines come in with separators and sometimes they don't
-      source_lines = source_lines.collect{|line|line.chomp}
-      scenario = CucumberAnalytics::Scenario.new(source_lines.join("\n"))
+      source_lines = source_lines.collect { |line| line.chomp }
 
-      # todo - Refactor this once cucumber_analytics is updated
-      case scenario.raw_element['keyword']
-        when 'Scenario Outline'
-          scenario = CucumberAnalytics::Outline.new(source_lines.join("\n"))
-        when 'Background'
-          scenario = CucumberAnalytics::Background.new(source_lines.join("\n"))
-      end
+      begin
+        scenario = CucumberAnalytics::Scenario.new(source_lines.join("\n"))
 
-
-      @type = scenario.raw_element['keyword']
-      @comments = scenario.raw_element['comments'].collect { |comment| comment['value'] } if scenario.raw_element['comments']
-      @tags = scenario.tags unless scenario.is_a?(CucumberAnalytics::Background)
-
-      @name = scenario.name
-      @name += ' ' + scenario.description.join(' ') unless scenario.description.empty?
-
-
-      scenario.steps.each do |step|
-        @steps += step.raw_element['comments'].collect { |comment| comment['value'] } if step.raw_element['comments']
-
-        # This can be done more simply if whitespace retention is not required.
-        @steps << source_lines[step.source_line - 2]
-
-        if step.block.is_a?(CucumberAnalytics::Table)
-          @inline_tables[@steps.last] = step.block.contents.collect { |table_row| '|' + table_row.join('|') + '|' }
+        # todo - Refactor this once cucumber_analytics is updated
+        case scenario.raw_element['keyword']
+          when 'Scenario Outline'
+            scenario = CucumberAnalytics::Outline.new(source_lines.join("\n"))
+          when 'Background'
+            scenario = CucumberAnalytics::Background.new(source_lines.join("\n"))
         end
-      end
-      @steps.delete_if { |step| step !~ STEP_REGEX }
 
 
-      if scenario.is_a?(CucumberAnalytics::Outline)
-        scenario.examples.count.times do |example_count|
-          example = scenario.examples[example_count]
+        @type = scenario.raw_element['keyword']
+        @comments = scenario.raw_element['comments'].collect { |comment| comment['value'] } if scenario.raw_element['comments']
+        @tags = scenario.tags unless scenario.is_a?(CucumberAnalytics::Background)
 
-          example.row_elements.count.times do |row_count|
-            next if row_count == 0 && example_count != 0
+        @name = scenario.name
+        @name += ' ' + scenario.description.join(' ') unless scenario.description.empty?
 
-            example_row = example.row_elements[row_count]
 
-            @examples_table += example_row.raw_element['comments'].collect { |comment| comment['value'] } if example_row.raw_element['comments']
+        scenario.steps.each do |step|
+          @steps += step.raw_element['comments'].collect { |comment| comment['value'] } if step.raw_element['comments']
 
-            # This can be done more simply if whitespace retention is not required.
-            @examples_table << source_lines[example_row.source_line - 2]
+          # This can be done more simply if whitespace retention is not required.
+          @steps << source_lines[step.source_line - 2]
+
+          if step.block.is_a?(CucumberAnalytics::Table)
+            @inline_tables[@steps.last] = step.block.contents.collect { |table_row| '|' + table_row.join('|') + '|' }
           end
         end
+        @steps.delete_if { |step| step !~ STEP_REGEX }
 
-        @examples_table.flatten!
-        @examples_table.delete_if { |row| row !~ EXAMPLE_ROW_REGEX }
+
+        if scenario.is_a?(CucumberAnalytics::Outline)
+          scenario.examples.count.times do |example_count|
+            example = scenario.examples[example_count]
+
+            example.row_elements.count.times do |row_count|
+              next if row_count == 0 && example_count != 0
+
+              example_row = example.row_elements[row_count]
+
+              @examples_table += example_row.raw_element['comments'].collect { |comment| comment['value'] } if example_row.raw_element['comments']
+
+              # This can be done more simply if whitespace retention is not required.
+              @examples_table << source_lines[example_row.source_line - 2]
+            end
+          end
+
+          @examples_table.flatten!
+          @examples_table.delete_if { |row| row !~ EXAMPLE_ROW_REGEX }
+        end
+
+      rescue Gherkin::Parser::ParseError
+        @syntax_error = true
       end
 
     end

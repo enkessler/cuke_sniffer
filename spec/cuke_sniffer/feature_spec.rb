@@ -362,14 +362,13 @@ describe "FeatureRules" do
   end
 
   it "should punish Features that have a comment on a line after a tag" do
-    pending("This specification does not work with valid gherkin")
     feature_block = [
         "@tag",
         "#comment",
         "     #comment with spaces",
         "Feature: I'm a feature with a comment after a tag"
     ]
-    test_feature_rule(feature_block, :comment_after_tag)
+    test_feature_rule(feature_block, :bad_syntax)
   end
 
   it "should not punish Features that have a tag with a hash in it" do
@@ -378,7 +377,7 @@ describe "FeatureRules" do
         "@#comment",
         "Feature: I'm a feature with a hash symbol in my tag"
     ]
-    test_no_feature_rule(feature_block, :comment_after_tag)
+    test_no_feature_rule(feature_block, :bad_syntax)
   end
 
   it "should punish Features that have commented tags" do
@@ -395,7 +394,7 @@ describe "FeatureRules" do
         "@tag",
         "Feature: I'm a feature with a comment before a tag"
     ]
-    test_no_feature_rule(feature_block, :comment_after_tag)
+    test_no_feature_rule(feature_block, :bad_syntax)
   end
 
 end

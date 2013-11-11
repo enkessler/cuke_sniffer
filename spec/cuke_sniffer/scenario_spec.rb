@@ -711,7 +711,6 @@ describe "ScenarioRules" do
   end
 
   it "should punish Scenarios that have a comment on a line after a tag" do
-    pending("This specification does not work with valid gherkin")
     scenario_block = [
         "@tag",
         "#comment",
@@ -719,7 +718,7 @@ describe "ScenarioRules" do
         "Scenario: Comment after Tag",
         "Given I am a step"
     ]
-    test_scenario_rule(scenario_block, :comment_after_tag)
+    test_scenario_rule(scenario_block, :bad_syntax)
   end
 
   it "should not punish Scenarios that have a tag with a hash in it" do
@@ -729,7 +728,7 @@ describe "ScenarioRules" do
         "Scenario: Comment after Tag",
         "Given I am a step"
     ]
-    test_no_scenario_rule(scenario_block, :comment_after_tag)
+    test_no_scenario_rule(scenario_block, :bad_syntax)
   end
 
   it "should punish Scenarios that have commented tags" do
@@ -747,7 +746,7 @@ describe "ScenarioRules" do
         "@tag",
         "Scenario: I'm a scenario with a comment before a tag"
     ]
-    test_no_scenario_rule(scenario_block, :comment_after_tag)
+    test_no_scenario_rule(scenario_block, :bad_syntax)
   end
 
   it "should punish implementation words Radio Button, not including button" do
@@ -947,7 +946,6 @@ describe "BackgroundRules" do
   end
 
   it "should not punish Backgrounds with too many tags" do
-    pending("This specification does not work with valid gherkin")
     background_block = []
     RULES[:too_many_tags][:max].times { |n| background_block << "@tag_#{n}" }
     background_block << "Background: Scenario with many tags"
@@ -1024,13 +1022,12 @@ describe "BackgroundRules" do
   end
 
   it "should punish Backgrounds that have tags" do
-    pending("This specification does not work with valid gherkin")
     background_block = [
         "@tag",
         "Background: I am a background",
         "Given I am a step",
     ]
-    test_background_rule(background_block, :background_with_tag)
+    test_background_rule(background_block, :background_with_bad_syntax)
   end
 
 end
