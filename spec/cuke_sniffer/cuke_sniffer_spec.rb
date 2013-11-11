@@ -181,17 +181,6 @@ describe CukeSniffer do
       actual_features.should == [CukeSniffer::Feature.new(@file_name)]
     end
 
-    it "should be able to handle the substitution of Scenario Outline steps that are missing the examples table" do
-      pending("This specification does not work with valid gherkin")
-      feature_block = [
-          "Feature: bad feature",
-          '#Scenario Outline: commented scenario',
-          '* I am a bad <var>'
-      ]
-      build_file(feature_block, @file_name)
-      expect { CukeSniffer::CLI.new({:features_location => @file_name}) }.to_not raise_error
-    end
-
     it "should be able to accept an examples table in a scenario outline with empty values" do
       feature_block = [
           "Feature: Just a plain old feature",

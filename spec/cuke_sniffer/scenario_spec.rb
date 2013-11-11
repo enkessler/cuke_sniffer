@@ -191,19 +191,6 @@ describe CukeSniffer::Scenario do
     ]
   end
 
-  it "should capture a scenario even if it commented out" do
-    pending("This specification does not work with valid gherkin")
-    scenario_block = [
-        "# Scenario: I am a commented Scenario",
-        "# Given I am commented",
-        "When I am commented",
-        "#Then we are all commented"
-    ]
-
-    scenario = CukeSniffer::Scenario.new("location:1", scenario_block)
-    scenario.name.should == "I am a commented Scenario"
-  end
-
   it "should capture inline tables and associate them with the step using the table" do
     scenario_block = [
         "Scenario: It has an inline table",
