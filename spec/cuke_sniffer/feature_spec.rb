@@ -15,15 +15,14 @@ describe CukeSniffer::Feature do
   end
 
   it "should gather all feature tags" do
-    pending("This specification does not work with valid gherkin")
     feature_block = [
         "@tag1 @tag2",
-        "@tag3", '#@tag4',
+        "@tag3",
         "Feature: My Features are in this"
     ]
     build_file(feature_block, @file_name)
     feature = CukeSniffer::Feature.new(@file_name)
-    feature.tags.should == ["@tag1", "@tag2", "@tag3", '#@tag4']
+    feature.tags.should == ["@tag1", "@tag2", "@tag3"]
   end
 
   it "should parse a feature file and gather the feature name" do

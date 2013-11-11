@@ -70,11 +70,9 @@ describe CukeSniffer::Scenario do
   end
 
   it "should retain information on a tagged scenario" do
-    pending("This specification does not work with valid gherkin")
     scenario_block = [
         "@tag1 @tag2",
         "@tag3",
-        "#comment before scenario",
         "Scenario: Test Scenario",
         "Given I am making a scenario",
         "When I make the scenario",
@@ -88,7 +86,6 @@ describe CukeSniffer::Scenario do
         "@tag1",
         "@tag2",
         "@tag3",
-        "#comment before scenario"
     ]
     step_definition.steps.should == [
         "Given I am making a scenario",
