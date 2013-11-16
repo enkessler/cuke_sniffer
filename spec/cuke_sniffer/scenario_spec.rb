@@ -312,7 +312,6 @@ describe CukeSniffer::Scenario do
   end
 
   it "should not pick up commented non-example lines in an example table" do
-    pending("This one needs some more thought")
     scenario_block = [
         "Scenario Outline: Commented example",
         "* step",
@@ -525,7 +524,6 @@ describe "ScenarioRules" do
   end
 
   it "should punish each step in a Scenario that is commented" do
-    pending("This one needs some more thought")
     scenario_block = [
         "Scenario: Scenario with commented line",
         "#Given I am first",
@@ -550,7 +548,6 @@ describe "ScenarioRules" do
   end
 
   it "should punish each commented example in a Scenario Outline" do
-    pending("This one needs some more thought")
     scenario_block = [
         "Scenario Outline: Scenario with commented line",
         "Given I am first",
@@ -919,7 +916,6 @@ describe "BackgroundRules" do
   end
 
   it "should punish each step in a Background that is commented" do
-    pending("This one needs some more thought")
     background_block = [
         "Background: Background with commented line",
         "#Given I am first",

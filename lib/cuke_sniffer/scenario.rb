@@ -77,9 +77,20 @@ module CukeSniffer
 
         # todo - Refactor this once cucumber_analytics is updated
         case scenario.raw_element['keyword']
+          when 'Scenario'
+            # Need to add a final concrete piece of gherkin to capture any trailing comment lines
+            source_lines << '* a stand-in step'
+
+            scenario = CucumberAnalytics::Scenario.new(source_lines.join("\n"))
           when 'Scenario Outline'
+            # Need to add a final concrete piece of gherkin to capture any trailing comment lines
+            source_lines << '|extra row|'
+
             scenario = CucumberAnalytics::Outline.new(source_lines.join("\n"))
           when 'Background'
+            # Need to add a final concrete piece of gherkin to capture any trailing comment lines
+            source_lines << '* a stand-in step'
+
             scenario = CucumberAnalytics::Background.new(source_lines.join("\n"))
         end
 
@@ -104,6 +115,8 @@ module CukeSniffer
         end
         @steps.delete_if { |step| step !~ STEP_REGEX }
 
+        # Need to remove added step
+        @steps.pop if ((@type == 'Scenario') || (@type == 'Background'))
 
         if scenario.is_a?(CucumberAnalytics::Outline)
           scenario.examples.count.times do |example_count|
@@ -123,6 +136,9 @@ module CukeSniffer
 
           @examples_table.flatten!
           @examples_table.delete_if { |row| row !~ EXAMPLE_ROW_REGEX }
+
+          # Need to remove added example row
+          @examples_table.pop if @type == 'Scenario Outline'
         end
 
       rescue Gherkin::Parser::ParseError
